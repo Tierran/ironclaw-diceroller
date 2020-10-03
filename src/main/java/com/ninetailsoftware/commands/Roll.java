@@ -1,0 +1,160 @@
+package com.ninetailsoftware.commands;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+public class Roll {
+
+	public String rollDice(String messageContent) {
+		String _retVal = new String();
+
+		Boolean opposed = new Boolean(false);
+		ArrayList<Integer> pcRolls = new ArrayList<Integer>();
+		ArrayList<Integer> opposedRolls = new ArrayList<Integer>();
+		Integer successes = null;
+
+		messageContent = messageContent.substring(5).trim();
+
+		if (messageContent.toLowerCase().contains("v")) {
+			opposed = true;
+			pcRolls = this.roll(messageContent.substring(0, messageContent.toLowerCase().indexOf('v')));
+			opposedRolls = this.roll(messageContent.substring(messageContent.toLowerCase().indexOf('v') + 1));
+			successes = this.compareRolls(pcRolls, opposedRolls);
+		}else if(messageContent.toLowerCase().contains("t")) { 
+			pcRolls = this.roll(messageContent.substring(0, messageContent.toLowerCase().indexOf('t')));
+			Integer target = Integer.parseInt(messageContent.substring(messageContent.toLowerCase().indexOf('t') + 1));
+			successes = this.compareRolls(pcRolls, target);
+		}
+		else {
+			pcRolls = this.roll(messageContent);
+		}
+
+		for (int i = 0; i < pcRolls.size(); i++) {
+			if (i > 0) {
+				_retVal += ", ";
+			} else {
+				_retVal += "[";
+			}
+			_retVal += pcRolls.get(i).toString();
+		}
+
+		_retVal += "]";
+
+		if (opposed) {
+			_retVal += " V [";
+			for (int i = 0; i < opposedRolls.size(); i++) {
+				if (i > 0) {
+					_retVal += ", ";
+				}
+				_retVal += opposedRolls.get(i).toString();
+			}
+			
+			_retVal += "]";
+		}
+		
+		if (successes != null) {
+			_retVal += " Successes: " + successes.toString();
+		}
+
+		return _retVal;
+	}
+
+	public ArrayList<Integer> roll(String diceList) {
+		ArrayList<Integer> rolls = new ArrayList<Integer>();
+		ArrayList<Integer> dice = new ArrayList<Integer>();
+		Random rand = new Random();
+		Boolean favored = false;
+
+		if (diceList.toLowerCase().contains("f")) {
+			favored = true;
+			diceList = diceList.replace("f", " ").trim();
+		}
+
+		diceList = diceList.replaceAll("\\s", "");
+		
+		for (int i = 0; i < diceList.length(); i++) {
+			if (Integer.parseInt(String.valueOf(diceList.charAt(i))) >= 4)
+				dice.add(Integer.parseInt(String.valueOf(diceList.charAt(i))));
+			else
+				dice.add(Integer.parseInt(String.valueOf(diceList.charAt(i))) + 10);
+		}
+
+		Collections.sort(dice, Collections.reverseOrder());
+
+		for (int i = 0; i < dice.size(); i++) {
+
+			if (dice.get(i).equals(12)) {
+				rolls.add((rand.nextInt(12) + 1));
+
+				if (favored && rolls.get(i).equals(1)) {
+					System.out.println("D12 Rerolled");
+					rolls.set(i, (rand.nextInt(12) + 1));
+					favored = false;
+				}
+			}
+			if (dice.get(i).equals(10)) {
+				rolls.add((rand.nextInt(10) + 1));
+
+				if (favored && rolls.get(i).equals(1)) {
+					System.out.println("D10 Rerolled");
+					rolls.set(i, (rand.nextInt(10) + 1));
+					favored = false;
+				}
+			}
+			if (dice.get(i).equals(8)) {
+				rolls.add((rand.nextInt(8) + 1));
+
+				if (favored && rolls.get(i).equals(1)) {
+					System.out.println("D8 Rerolled");
+					rolls.set(i, (rand.nextInt(8) + 1));
+					favored = false;
+				}
+			}
+			if (dice.get(i).equals(6)) {
+				rolls.add((rand.nextInt(6) + 1));
+
+				if (favored && rolls.get(i).equals(1)) {
+					System.out.println("D6 Rerolled");
+					rolls.set(i, (rand.nextInt(6) + 1));
+					favored = false;
+				}
+			}
+			if (dice.get(i).equals(4)) {
+				rolls.add((rand.nextInt(4) + 1));
+				if (favored && rolls.get(i).equals(1)) {
+					System.out.println("D4 Rerolled");
+					rolls.set(i, (rand.nextInt(4) + 1));
+					favored = false;
+				}
+			}
+		}
+
+		return rolls;
+	}
+
+	public Integer compareRolls(ArrayList<Integer> pcRolls, ArrayList<Integer> opposedRolls) {
+		Integer successes = 0;
+		Integer maxRoll = Collections.max(opposedRolls);
+
+		for (int i = 0; i < pcRolls.size(); i++) {
+			if (pcRolls.get(i) > maxRoll) {
+				successes++;
+			}
+		}
+
+		return successes;
+	}
+
+	public Integer compareRolls(ArrayList<Integer> pcRolls, Integer target) {
+		Integer successes = 0;
+
+		for (int i = 0; i < pcRolls.size(); i++) {
+			if (pcRolls.get(i) > target) {
+				successes++;
+			}
+		}
+
+		return successes;
+	}
+}

@@ -21,38 +21,49 @@ public class Roll {
 			pcRolls = this.roll(messageContent.substring(0, messageContent.toLowerCase().indexOf('v')));
 			opposedRolls = this.roll(messageContent.substring(messageContent.toLowerCase().indexOf('v') + 1));
 			successes = this.compareRolls(pcRolls, opposedRolls);
-		}else if(messageContent.toLowerCase().contains("t")) { 
+		} else if (messageContent.toLowerCase().contains("t")) {
 			pcRolls = this.roll(messageContent.substring(0, messageContent.toLowerCase().indexOf('t')));
 			Integer target = Integer.parseInt(messageContent.substring(messageContent.toLowerCase().indexOf('t') + 1));
 			successes = this.compareRolls(pcRolls, target);
-		}
-		else {
+		} else {
 			pcRolls = this.roll(messageContent);
 		}
 
-		for (int i = 0; i < pcRolls.size(); i++) {
+		if (opposed) {
+			_retVal = buildResultString(successes, pcRolls, opposedRolls);
+		} else {
+			_retVal = buildResultString(successes, pcRolls);
+		}
+
+		return _retVal;
+	}
+
+	public String buildResultString(Integer successes, ArrayList<Integer>... rolls) {
+		String _retVal = "";
+
+		for (int i = 0; i < rolls[0].size(); i++) {
 			if (i > 0) {
 				_retVal += ", ";
 			} else {
 				_retVal += "[";
 			}
-			_retVal += pcRolls.get(i).toString();
+			_retVal += rolls[0].get(i).toString();
 		}
 
 		_retVal += "]";
 
-		if (opposed) {
+		if (rolls.length > 1) {
 			_retVal += " V [";
-			for (int i = 0; i < opposedRolls.size(); i++) {
+			for (int i = 0; i < rolls[1].size(); i++) {
 				if (i > 0) {
 					_retVal += ", ";
 				}
-				_retVal += opposedRolls.get(i).toString();
+				_retVal += rolls[1].get(i).toString();
 			}
-			
+
 			_retVal += "]";
 		}
-		
+
 		if (successes != null) {
 			_retVal += " Successes: " + successes.toString();
 		}
@@ -72,7 +83,7 @@ public class Roll {
 		}
 
 		diceList = diceList.replaceAll("\\s", "");
-		
+
 		for (int i = 0; i < diceList.length(); i++) {
 			if (Integer.parseInt(String.valueOf(diceList.charAt(i))) >= 4)
 				dice.add(Integer.parseInt(String.valueOf(diceList.charAt(i))));

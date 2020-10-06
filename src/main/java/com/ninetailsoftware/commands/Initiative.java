@@ -21,6 +21,7 @@ public class Initiative {
 		ArrayList<Integer> initRolls = new ArrayList<Integer>();
 		Integer successes = 0;
 		InitRoll ir = new InitRoll();
+		Boolean tied = false;
 
 		messageContent = messageContent.toLowerCase();
 		
@@ -44,10 +45,10 @@ public class Initiative {
 
 			if (messageContent.contains("npc")) {
 				ir.setType("NPC");
-				messageContent = messageContent.replace("npc", " ");
+				messageContent = messageContent.replace("npc", "");
 			} else {
 				ir.setType("PC");
-				messageContent = messageContent.replace("pc", " ");
+				messageContent = messageContent.replace("pc", "");
 			}
 
 			messageContent = messageContent.substring(5).trim();
@@ -58,14 +59,30 @@ public class Initiative {
 			}
 			Integer target = Integer.parseInt(messageContent.substring(messageContent.toLowerCase().indexOf('t') + 1));
 			ir.setSuccesses(roll.compareRolls(initRolls, target));
+			if(ir.getSuccesses() == 0 && roll.compareRolls(initRolls, target-1) >= 1 ) {
+				tied = true;
+			}
 
 			addNewInit(ir);
+		}else {
+			new MessageBuilder()
+			.append(userName, MessageDecoration.BOLD)
+			.append(" Init Roll Should Include NPC or PC")
+			.send(channel);
+			
+			return;
 		}
 
+		String rolledText = " Total: " + ir.getRoll().toString();
+		
+		if(tied) {
+			rolledText += " (TIED)";
+		}
+		
 		new MessageBuilder()
 			.append(userName, MessageDecoration.BOLD)
-			.append(" Rolled: " + ir.getRoll().toString() + " Successes: "+ ir.getSuccesses().toString())
-			.appendNewLine()
+			.append(" rolled: " + roll.buildResultString(successes, initRolls)).appendNewLine()
+			.append(rolledText).appendNewLine()
 			.append(this.buildTurnOrder())
 			.send(channel);
 	}

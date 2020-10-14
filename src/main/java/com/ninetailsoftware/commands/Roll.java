@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.MessageDecoration;
+
 public class Roll {
 
-	public String rollDice(String messageContent) {
-		String _retVal = new String();
+	public void rollDice(String messageContent, String userName, TextChannel channel) {
+		String resultString = new String();
 
 		Boolean opposed = new Boolean(false);
 		ArrayList<Integer> pcRolls = new ArrayList<Integer>();
@@ -30,12 +34,15 @@ public class Roll {
 		}
 
 		if (opposed) {
-			_retVal = buildResultString(successes, pcRolls, opposedRolls);
+			resultString = buildResultString(successes, pcRolls, opposedRolls);
 		} else {
-			_retVal = buildResultString(successes, pcRolls);
+			resultString = buildResultString(successes, pcRolls);
 		}
-
-		return _retVal;
+		
+		new MessageBuilder()
+		.append(userName, MessageDecoration.BOLD)
+		.append(" rolled: " + resultString).appendNewLine()
+		.send(channel);
 	}
 
 	public String buildResultString(Integer successes, ArrayList<Integer>... rolls) {

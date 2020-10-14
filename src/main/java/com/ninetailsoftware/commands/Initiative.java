@@ -81,7 +81,7 @@ public class Initiative {
 		
 		new MessageBuilder()
 			.append(userName, MessageDecoration.BOLD)
-			.append(" rolled: " + roll.buildResultString(successes, initRolls)).appendNewLine()
+			.append(" rolled: " + roll.buildResultString(ir.getSuccesses() , initRolls)).appendNewLine()
 			.append(rolledText).appendNewLine()
 			.append(this.buildTurnOrder())
 			.send(channel);

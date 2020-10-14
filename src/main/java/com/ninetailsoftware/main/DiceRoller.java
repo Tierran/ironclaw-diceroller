@@ -54,7 +54,7 @@ public class DiceRoller {
 		
 		api.addMessageCreateListener(event -> {
 			if (event.getMessageContent().startsWith("!roll")) {
-				event.getChannel().sendMessage(roller.rollDice(event.getMessageContent()));
+				roller.rollDice(event.getMessageContent(), event.getMessageAuthor().getDisplayName(), event.getChannel());
 			}
 		});
 		

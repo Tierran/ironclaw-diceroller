@@ -25,7 +25,7 @@ public class Initiative {
 
 		messageContent = messageContent.toLowerCase();
 		
-		if (messageContent.length() == 5) {
+		if (messageContent.equalsIgnoreCase("!init")) {
 			channel.sendMessage(this.buildTurnOrder());
 			return;
 		}
@@ -136,7 +136,7 @@ public class Initiative {
 			turnOrder.add(init);
 			if((String.valueOf(messageContent.charAt(i)).equalsIgnoreCase("N")))
 					init.setType("NPC");
-			else
+			else if((String.valueOf(messageContent.charAt(i)).equalsIgnoreCase("P")))
 				init.setType("PC");
 		}
 	}

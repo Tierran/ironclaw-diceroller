@@ -12,13 +12,40 @@ public class Roll {
 
 	public void rollDice(String messageContent, String userName, TextChannel channel) {
 		String resultString = new String();
+		
+		String attackType = "none";
 
-		Boolean opposed = new Boolean(false);
+		Boolean opposed = false;
 		ArrayList<Integer> pcRolls = new ArrayList<Integer>();
 		ArrayList<Integer> opposedRolls = new ArrayList<Integer>();
 		Integer successes = null;
 
-		messageContent = messageContent.substring(5).trim();
+		//messageContent = messageContent.substring(5).trim();
+		
+		messageContent = messageContent.toLowerCase();
+		/**
+		 *  Removing the roll command before proceeding to check other flags
+		 */
+		messageContent = messageContent.replace("!roll", "").trim();
+		
+		if(messageContent.contains("counter")) {
+			attackType = "counter";
+			messageContent = messageContent.replace("counter","");
+		}
+		
+		if(messageContent.contains("parry")) {	
+			if (attackType.contentEquals("counter")) {
+				new MessageBuilder()
+				.append(userName, MessageDecoration.BOLD)
+				.append(" Roll can't contain both 'parry' and 'counter'")
+				.send(channel);
+				
+				return;
+			}
+			attackType = "parry";
+			messageContent = messageContent.replace("parry","");
+		}
+		
 
 		if (messageContent.toLowerCase().contains("v")) {
 			opposed = true;
@@ -32,11 +59,32 @@ public class Roll {
 		} else {
 			pcRolls = this.roll(messageContent);
 		}
+	
 
 		if (opposed) {
 			resultString = buildResultString(successes, pcRolls, opposedRolls);
 		} else {
 			resultString = buildResultString(successes, pcRolls);
+		}
+		
+		if (attackType.contentEquals("counter") && successes == 0) {
+			Integer defenderSuccesses = this.compareRolls(opposedRolls, pcRolls);
+			if(defenderSuccesses > 0) {
+				String defenderSuccesString = " successes!";
+			
+				if(defenderSuccesses==1) {
+					defenderSuccesString = " success!";
+				}
+				
+				new MessageBuilder()
+				.append(userName, MessageDecoration.BOLD)
+				.append(" rolled: " + resultString).appendNewLine()
+				.append("Defender", MessageDecoration.BOLD)
+				.append(" wins with " + defenderSuccesses + defenderSuccesString)
+				.send(channel);
+				
+				return;
+			}
 		}
 		
 		new MessageBuilder()
@@ -174,5 +222,26 @@ public class Roll {
 		}
 
 		return successes;
+	}
+	
+	public Boolean checkForTie(ArrayList<Integer> challengeRoll, ArrayList<Integer> opposedRolls) {
+		Boolean tied = false;
+		Integer maxChallengeRoll = Collections.max(challengeRoll);
+		Integer maxOpposedRoll = Collections.max(opposedRolls);
+
+		if(maxChallengeRoll == maxOpposedRoll)
+			tied=true;
+
+		return tied;
+	}
+	
+	public Boolean checkForTie(ArrayList<Integer> challengeRoll, Integer target) {
+		Boolean tied = false;
+		Integer maxChallengeRoll = Collections.max(challengeRoll);
+
+		if(maxChallengeRoll == target)
+			tied=true;
+
+		return tied;
 	}
 }

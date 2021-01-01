@@ -15,7 +15,7 @@ public class Help {
 			.append("!roll <favored><dice>t<target number> ").append("VS Target Number", MessageDecoration.BOLD).appendNewLine()
 			.append("!roll <defense-type> <favored><dice>v<favored><dice> ").append("Opposed Role", MessageDecoration.BOLD).appendNewLine()
 			.append("Options Key: ", MessageDecoration.BOLD, MessageDecoration.UNDERLINE).appendNewLine()
-			.append("Defense type (optional): COUNTER or PARRY").appendNewLine()
+			.append("Defense type (optional): COUNTER, DODGE,  or PARRY").appendNewLine()
 			.append("Favored use (optional): F").appendNewLine()
 			.append("Dice Key: ", MessageDecoration.BOLD, MessageDecoration.UNDERLINE).appendNewLine()
 			.append("D12: 2").appendNewLine()

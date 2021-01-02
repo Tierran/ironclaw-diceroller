@@ -5,7 +5,7 @@ Discord bot to support playing Ironclaw.
 
 Download the jar from the current release here:
 
-https://github.com/Tierran/ironclaw-diceroller/releases/tag/1.0.5
+https://github.com/Tierran/ironclaw-diceroller/releases/latest
 
 ## Getting Started
 

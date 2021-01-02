@@ -85,15 +85,34 @@ public class Roll {
 				}
 			} else if (defenderSuccesses == 0 && checkForTie(pcRolls, opposedRolls)) {
 				defenderSuccesString = " and attacker are TIED";
+				Integer target = Collections.max(opposedRolls) - 1;
+				successes = compareRolls(pcRolls, target);
+				defenderSuccesses = compareRolls(opposedRolls, target);
 			}
 
-			new MessageBuilder()
-					.append(userName, MessageDecoration.BOLD)
-					.append(" rolled: " + resultString).appendNewLine()
-					.append("Defender", MessageDecoration.BOLD)
-					.append(defenderSuccesString).send(channel);
-
-			return;
+			if (!checkForTie(pcRolls, opposedRolls)) {
+				new MessageBuilder()
+						.append(userName, MessageDecoration.BOLD)
+						.append(" rolled: " + resultString).appendNewLine()
+						.append("Defender", MessageDecoration.BOLD)
+						.append(defenderSuccesString).send(channel);
+	
+					return;
+			}else {
+				
+				String attackerSuccessMessage = "Attacker Successes: " + successes;
+				String defenderSuccessMessage = "Defender Successes: " + defenderSuccesses;
+				
+				new MessageBuilder()
+						.append(userName, MessageDecoration.BOLD)
+						.append(" rolled: " + resultString).appendNewLine()
+						.append("Defender", MessageDecoration.BOLD)
+						.append(defenderSuccesString).appendNewLine()
+						.append(attackerSuccessMessage).appendNewLine()
+						.append(defenderSuccessMessage)
+						.send(channel);
+				return;
+			}
 		}
 
 		if ((attackType.contentEquals("parry") || attackType.contentEquals("dodge")) && checkForTie(pcRolls, opposedRolls)) {

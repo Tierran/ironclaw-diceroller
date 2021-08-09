@@ -12,7 +12,7 @@ public class InitiativeTest {
 		Initiative initiative = new Initiative();
 		String response = initiative.buildTurnOrder();
 		
-		Assert.assertEquals(response, "");
+		Assert.assertEquals(response, "No Initiative Set");
 	}
 	
 }

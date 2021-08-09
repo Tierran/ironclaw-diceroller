@@ -143,6 +143,10 @@ public class Initiative {
 
 	public String buildTurnOrder() {
 		String _retVal = new String();
+		
+		if (turnOrder.size() == 0) {
+			return "No Initiative Set";
+		}
 
 		for (int i = 0; i < turnOrder.size(); i++) {
 

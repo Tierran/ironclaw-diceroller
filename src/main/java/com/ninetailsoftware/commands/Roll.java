@@ -13,7 +13,7 @@ public class Roll {
 	public void rollDice(String messageContent, String userName, TextChannel channel) {
 		String resultString = new String();
 
-		String attackType = "none";
+		String rollType = "roll";
 
 		Boolean opposed = false;
 		ArrayList<Integer> pcRolls = new ArrayList<Integer>();
@@ -26,34 +26,10 @@ public class Roll {
 		/**
 		 * Removing the roll command before proceeding to check other flags
 		 */
-		messageContent = messageContent.replace("!roll", "").trim();
-
-		if (messageContent.contains("counter")) {
-			attackType = "counter";
-			messageContent = messageContent.replace("counter", "");
-		}
-
-		if (messageContent.contains("parry")) {
-			if (attackType.contentEquals("counter")) {
-				new MessageBuilder().append(userName, MessageDecoration.BOLD)
-						.append(" Roll can only contain one of 'parry', 'dodge', or 'counter'").send(channel);
-
-				return;
-			}
-			attackType = "parry";
-			messageContent = messageContent.replace("parry", "");
-		}
 		
-		if (messageContent.contains("dodge")) {
-			if (attackType.contentEquals("counter") || attackType.contentEquals("parry")) {
-				new MessageBuilder().append(userName, MessageDecoration.BOLD)
-						.append(" Roll can only contain one of 'parry', 'dodge', or 'counter'").send(channel);
-
-				return;
-			}
-			attackType = "dodge";
-			messageContent = messageContent.replace("dodge", "");
-		}		
+		rollType = getRollType(messageContent);
+		
+		messageContent = messageContent.replace(messageContent.substring(0, messageContent.indexOf(" ")), "").trim();
 
 		if (messageContent.toLowerCase().contains("v")) {
 			opposed = true;
@@ -74,7 +50,7 @@ public class Roll {
 			resultString = buildResultString(successes, pcRolls);
 		}
 
-		if (attackType.contentEquals("counter") && successes == 0) {
+		if (rollType.contentEquals("counter") && successes == 0) {
 			Integer defenderSuccesses = this.compareRolls(opposedRolls, pcRolls);
 			String defenderSuccesString = " wins with " + defenderSuccesses + " successes!";
 
@@ -91,44 +67,35 @@ public class Roll {
 			}
 
 			if (!checkForTie(pcRolls, opposedRolls)) {
-				new MessageBuilder()
-						.append(userName, MessageDecoration.BOLD)
-						.append(" rolled: " + resultString).appendNewLine()
-						.append("Defender", MessageDecoration.BOLD)
-						.append(defenderSuccesString).send(channel);
-	
-					return;
-			}else {
-				
+				new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString)
+						.appendNewLine().append("Defender", MessageDecoration.BOLD).append(defenderSuccesString)
+						.send(channel);
+
+				return;
+			} else {
+
 				String attackerSuccessMessage = "Attacker Successes: " + successes;
 				String defenderSuccessMessage = "Defender Successes: " + defenderSuccesses;
-				
-				new MessageBuilder()
-						.append(userName, MessageDecoration.BOLD)
-						.append(" rolled: " + resultString).appendNewLine()
-						.append("Defender", MessageDecoration.BOLD)
-						.append(defenderSuccesString).appendNewLine()
-						.append(attackerSuccessMessage).appendNewLine()
-						.append(defenderSuccessMessage)
+
+				new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString)
+						.appendNewLine().append("Defender", MessageDecoration.BOLD).append(defenderSuccesString)
+						.appendNewLine().append(attackerSuccessMessage).appendNewLine().append(defenderSuccessMessage)
 						.send(channel);
 				return;
 			}
 		}
 
-		if ((attackType.contentEquals("parry") || attackType.contentEquals("dodge")) && checkForTie(pcRolls, opposedRolls)) {
-			new MessageBuilder()
-					.append(userName, MessageDecoration.BOLD)
-					.append(" rolled: " + resultString).appendNewLine()
-					.append("Defender", MessageDecoration.BOLD)
-					.append(" and attacker are TIED!")
+		if ((rollType.contentEquals("parry") || rollType.contentEquals("dodge"))
+				&& checkForTie(pcRolls, opposedRolls)) {
+			new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString)
+					.appendNewLine().append("Defender", MessageDecoration.BOLD).append(" and attacker are TIED!")
+					.appendNewLine().append("Retreat", MessageDecoration.BOLD).append(" or be sent REELING!")
 					.send(channel);
 
 			return;
 		}
 
-		new MessageBuilder()
-				.append(userName, MessageDecoration.BOLD)
-				.append(" rolled: " + resultString).appendNewLine()
+		new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString).appendNewLine()
 				.send(channel);
 	}
 
@@ -282,5 +249,27 @@ public class Roll {
 			tied = true;
 
 		return tied;
+	}
+
+	private String getRollType(String messageContent) {
+		String _retVal = null;
+
+		switch (messageContent.substring(0, messageContent.indexOf(" "))) {
+			case "!roll":
+			case "!r":
+				_retVal = "roll";
+				break;
+			case "!counter":
+				_retVal = "counter";
+				break;
+			case "!dodge":
+				_retVal = "dodge";
+				break;
+			case "!parry":
+				_retVal = "parry";
+				break;
+		}
+
+		return _retVal;
 	}
 }

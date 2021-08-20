@@ -89,7 +89,7 @@ public class Roll {
 				&& checkForTie(pcRolls, opposedRolls)) {
 			new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString)
 					.appendNewLine().append("Defender", MessageDecoration.BOLD).append(" and attacker are TIED!")
-					.appendNewLine().append("Retreat", MessageDecoration.BOLD).append(" or be sent REELING!")
+					.appendNewLine().append("Retreat", MessageDecoration.BOLD).append(" or attack succeeds!")
 					.send(channel);
 
 			return;

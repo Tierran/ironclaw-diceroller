@@ -7,16 +7,17 @@ import java.util.Properties;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.event.message.MessageCreateEvent;
 
 import com.ninetailsoftware.commands.Help;
 import com.ninetailsoftware.commands.Initiative;
 import com.ninetailsoftware.commands.Roll;
+import com.ninetailsoftware.commands.Status;
 
 public class DiceRoller {
 
 	private static Roll roller = new Roll();
 	private static Initiative init = new Initiative();
+	private static Status status = new Status();
 	private static Help help = new Help();
 
 	public void CreateInvite() {
@@ -66,6 +67,19 @@ public class DiceRoller {
 			if (event.getMessageContent().startsWith("!init")) {
 				init.initativeRoll(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
 						event.getChannel());
+			}
+		});
+		
+
+		api.addMessageCreateListener(event -> {
+			if (event.getMessageContent().startsWith("!status add")) {
+				status.setStatus(event.getMessageContent());
+			}
+		});
+		
+		api.addMessageCreateListener(event -> {
+			if (event.getMessageContent().startsWith("!status all")) {
+				status.showAllStatus(event.getChannel());
 			}
 		});
 

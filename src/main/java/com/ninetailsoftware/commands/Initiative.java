@@ -61,7 +61,12 @@ public class Initiative {
 				messageContent = messageContent.replace(characterName, "");
 			} else {
 				ir.setType("PC");
+				
+				if (messageContent.split(" ").length == 4)
+					characterName = messageContent.split(" ")[3];
+				
 				messageContent = messageContent.replace("pc", "");
+				messageContent = messageContent.replace(characterName, "");
 			}
 
 			messageContent = messageContent.substring(5).trim();

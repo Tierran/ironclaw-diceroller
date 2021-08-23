@@ -56,8 +56,8 @@ public class DiceRoller {
 		api.addMessageCreateListener(event -> {
 			if (event.getMessageContent().startsWith("!roll") || event.getMessageContent().startsWith("!r ")
 					|| event.getMessageContent().startsWith("!counter")
-					|| event.getMessageContent().startsWith("!parry")
-					|| event.getMessageContent().startsWith("!dodge")) {
+					|| event.getMessageContent().startsWith("!parry") || event.getMessageContent().startsWith("!dodge")
+					|| event.getMessageContent().startsWith("!flip")) {
 				roller.rollDice(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
 						event.getChannel());
 			}
@@ -69,17 +69,10 @@ public class DiceRoller {
 						event.getChannel());
 			}
 		});
-		
 
 		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!status add")) {
-				status.setStatus(event.getMessageContent());
-			}
-		});
-		
-		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!status all")) {
-				status.showAllStatus(event.getChannel());
+			if (event.getMessageContent().startsWith("!status")) {
+				status.statusCommand(event.getMessageContent(), event.getChannel());
 			}
 		});
 

@@ -24,3 +24,6 @@ Make sure you have Java installed on the system you will be running this bot. Th
 Finally, this can be run using java -jar \<filename\> (example: java -jar ironclaw-diceroller-1.0.5.jar)
   
 You should now have the bot in your server. If you would like the bot to permently run as a service, you can run the bot on a Raspberry Pi. 
+
+![image](https://user-images.githubusercontent.com/1091720/130515534-3f001030-bb51-4a0b-bfef-a82586546aad.png)
+

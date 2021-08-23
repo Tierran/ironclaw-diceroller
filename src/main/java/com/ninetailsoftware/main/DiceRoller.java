@@ -7,16 +7,17 @@ import java.util.Properties;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.event.message.MessageCreateEvent;
 
 import com.ninetailsoftware.commands.Help;
 import com.ninetailsoftware.commands.Initiative;
 import com.ninetailsoftware.commands.Roll;
+import com.ninetailsoftware.commands.Status;
 
 public class DiceRoller {
 
 	private static Roll roller = new Roll();
 	private static Initiative init = new Initiative();
+	private static Status status = new Status();
 	private static Help help = new Help();
 
 	public void CreateInvite() {
@@ -55,8 +56,8 @@ public class DiceRoller {
 		api.addMessageCreateListener(event -> {
 			if (event.getMessageContent().startsWith("!roll") || event.getMessageContent().startsWith("!r ")
 					|| event.getMessageContent().startsWith("!counter")
-					|| event.getMessageContent().startsWith("!parry")
-					|| event.getMessageContent().startsWith("!dodge")) {
+					|| event.getMessageContent().startsWith("!parry") || event.getMessageContent().startsWith("!dodge")
+					|| event.getMessageContent().startsWith("!flip")) {
 				roller.rollDice(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
 						event.getChannel());
 			}
@@ -66,6 +67,12 @@ public class DiceRoller {
 			if (event.getMessageContent().startsWith("!init")) {
 				init.initativeRoll(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
 						event.getChannel());
+			}
+		});
+
+		api.addMessageCreateListener(event -> {
+			if (event.getMessageContent().startsWith("!status")) {
+				status.statusCommand(event.getMessageContent(), event.getChannel());
 			}
 		});
 

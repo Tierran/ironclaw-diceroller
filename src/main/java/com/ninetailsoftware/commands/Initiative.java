@@ -23,68 +23,138 @@ public class Initiative {
 		InitRoll ir = new InitRoll();
 		Boolean tied = false;
 
+		String characterName = userName;
+
 		messageContent = messageContent.toLowerCase();
-		
+
 		if (messageContent.equalsIgnoreCase("!init")) {
 			channel.sendMessage(this.buildTurnOrder());
 			return;
 		}
-		
-		if(messageContent.contains("!init reset")) {
+
+		if (messageContent.contains("!init reset")) {
 			this.resetInitiative();
 			return;
 		}
-		
-		if(messageContent.contains("!init set")) {
+
+		if (messageContent.contains("!init set")) {
 			this.setInitiative(messageContent);
 			channel.sendMessage(this.buildTurnOrder());
 			return;
 		}
-			
+		
+		if (messageContent.contains("!init drop")) {
+			this.dropLastFromInitiative(messageContent.split(" ")[2]);
+			channel.sendMessage(this.buildTurnOrder());
+			return;
+		}
+
 		if (messageContent.contains("npc") || messageContent.contains("pc")) {
 
 			if (messageContent.contains("npc")) {
 				ir.setType("NPC");
+
+				if (messageContent.split(" ").length == 4)
+					characterName = messageContent.split(" ")[3];
+
 				messageContent = messageContent.replace("npc", "");
+				messageContent = messageContent.replace(characterName, "");
 			} else {
 				ir.setType("PC");
 				messageContent = messageContent.replace("pc", "");
 			}
 
 			messageContent = messageContent.substring(5).trim();
-			
+
 			initRolls = roll.roll(messageContent.substring(0, messageContent.toLowerCase().indexOf('t')));
 			for (int i = 0; i < initRolls.size(); i++) {
 				ir.setRoll(ir.getRoll() + initRolls.get(i));
 			}
 			Integer target = Integer.parseInt(messageContent.substring(messageContent.toLowerCase().indexOf('t') + 1));
 			ir.setSuccesses(roll.compareRolls(initRolls, target));
-			if(ir.getSuccesses() == 0 && roll.compareRolls(initRolls, target-1) >= 1 ) {
+			if (ir.getSuccesses() == 0 && roll.compareRolls(initRolls, target - 1) >= 1) {
 				tied = true;
 			}
 
 			addNewInit(ir);
-		}else {
-			new MessageBuilder()
-			.append(userName, MessageDecoration.BOLD)
-			.append(" Init Roll Should Include NPC or PC")
-			.send(channel);
-			
+		} else {
+			new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" Init Roll Should Include NPC or PC")
+					.send(channel);
+
 			return;
 		}
 
 		String rolledText = " Total: " + ir.getRoll().toString();
-		
-		if(tied) {
+
+		if (tied) {
 			rolledText += " (TIED)";
 		}
-		
-		new MessageBuilder()
-			.append(userName, MessageDecoration.BOLD)
-			.append(" rolled: " + roll.buildResultString(ir.getSuccesses() , initRolls)).appendNewLine()
-			.append(rolledText).appendNewLine()
-			.append(this.buildTurnOrder())
-			.send(channel);
+
+		setStatusOnInit(ir, characterName, initRolls);
+
+		MessageBuilder mb = new MessageBuilder();
+		mb.append(userName, MessageDecoration.BOLD)
+				.append(" rolled: " + roll.buildResultString(ir.getSuccesses(), initRolls)).appendNewLine()
+				.append(rolledText).appendNewLine();
+
+		if (ir.getSuccesses() == 0) {
+			Boolean botch = true;
+			for (int i = 0; i < initRolls.size(); i++) {
+				if (initRolls.get(i) > 1) {
+					botch = false;
+					break;
+				}
+			}
+			if (botch) {
+				mb.append("You enter the battle Reeling!").appendNewLine();
+			} else if (tied) {
+				mb.append("Willing! Take a Ready action but then you will be Reeling!").appendNewLine();
+			} else {
+				mb.append("Able! Prepare to fight!").appendNewLine();
+			}
+		} else if (ir.getSuccesses() == 1) {
+			mb.append("Ready! Take a Ready action and a Reload or Stride!").appendNewLine();
+		} else if  (ir.getSuccesses() > 1) {
+			mb.append("Focused! Take a Ready action and a Reload or Stride!").appendNewLine();
+		}
+
+		mb.appendNewLine().append(this.buildTurnOrder()).send(channel);
+	}
+
+	private void dropLastFromInitiative(String dropToken) {
+		InitRoll ir;
+		for(int i = turnOrder.size()-1; i>=0; i--) {
+			ir = turnOrder.get(i);
+			if(ir.getType().equalsIgnoreCase(dropToken)) {
+				turnOrder.remove(ir);
+				break;
+			}
+		}		
+	}
+
+	private void setStatusOnInit(InitRoll ir, String userName, ArrayList<Integer> initRolls) {
+
+		String status = null;
+
+		if (ir.getSuccesses() >= 2) {
+			status = "Focused";
+		}
+
+		Boolean botch = true;
+		for (int i = 0; i < initRolls.size(); i++) {
+			if (initRolls.get(i) > 1) {
+				botch = false;
+				break;
+			}
+		}
+
+		if (botch) {
+			status = "Reeling";
+		}
+
+		Status s = new Status();
+		s.addStatus(userName, ir.getType(), status);
+
 	}
 
 	private void addNewInit(InitRoll ir) {
@@ -119,31 +189,31 @@ public class Initiative {
 				}
 			}
 		}
-		
+
 		turnOrder.add(ir);
 	}
-	
+
 	private void resetInitiative() {
 		turnOrder = new LinkedList<InitRoll>();
 	}
-	
+
 	private void setInitiative(String messageContent) {
 		this.resetInitiative();
-		
+
 		messageContent = messageContent.replace("!init set", "").trim();
-		for(int i = 0; i<messageContent.length(); i++) {
+		for (int i = 0; i < messageContent.length(); i++) {
 			InitRoll init = new InitRoll();
 			turnOrder.add(init);
-			if((String.valueOf(messageContent.charAt(i)).equalsIgnoreCase("N")))
-					init.setType("NPC");
-			else if((String.valueOf(messageContent.charAt(i)).equalsIgnoreCase("P")))
+			if ((String.valueOf(messageContent.charAt(i)).equalsIgnoreCase("N")))
+				init.setType("NPC");
+			else if ((String.valueOf(messageContent.charAt(i)).equalsIgnoreCase("P")))
 				init.setType("PC");
 		}
 	}
 
 	public String buildTurnOrder() {
 		String _retVal = new String();
-		
+
 		if (turnOrder.size() == 0) {
 			return "No Initiative Set";
 		}

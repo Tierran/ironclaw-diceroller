@@ -29,6 +29,11 @@ public class Roll {
 		
 		rollType = getRollType(messageContent);
 		
+		if(rollType.equalsIgnoreCase("flip")) {
+			this.flip(userName, channel);
+			return;
+		}
+		
 		messageContent = messageContent.replace(messageContent.substring(0, messageContent.indexOf(" ")), "").trim();
 
 		if (messageContent.toLowerCase().contains("v")) {
@@ -89,7 +94,7 @@ public class Roll {
 				&& checkForTie(pcRolls, opposedRolls)) {
 			new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString)
 					.appendNewLine().append("Defender", MessageDecoration.BOLD).append(" and attacker are TIED!")
-					.appendNewLine().append("Retreat", MessageDecoration.BOLD).append(" or be sent REELING!")
+					.appendNewLine().append("Retreat", MessageDecoration.BOLD).append(" or attack succeeds!")
 					.send(channel);
 
 			return;
@@ -97,6 +102,22 @@ public class Roll {
 
 		new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" rolled: " + resultString).appendNewLine()
 				.send(channel);
+	}
+
+	private void flip(String userName, TextChannel channel) {
+		Random rand = new Random();
+		Integer flip = rand.nextInt(2);
+		String earsOrTails;
+		
+		if(flip==0) {
+			earsOrTails = "<:foxhead:879374850211336232>";
+		}else {
+			earsOrTails = "<:foxtail:879375194672734218>";
+		}
+		
+		new MessageBuilder().append(userName, MessageDecoration.BOLD).append(" got: ").appendNewLine()
+		.append(earsOrTails)
+		.send(channel);
 	}
 
 	public String buildResultString(Integer successes, ArrayList<Integer>... rolls) {
@@ -160,7 +181,6 @@ public class Roll {
 				rolls.add((rand.nextInt(12) + 1));
 
 				if (favored && rolls.get(i).equals(1)) {
-					System.out.println("D12 Rerolled");
 					rolls.set(i, (rand.nextInt(12) + 1));
 					favored = false;
 				}
@@ -169,7 +189,6 @@ public class Roll {
 				rolls.add((rand.nextInt(10) + 1));
 
 				if (favored && rolls.get(i).equals(1)) {
-					System.out.println("D10 Rerolled");
 					rolls.set(i, (rand.nextInt(10) + 1));
 					favored = false;
 				}
@@ -178,7 +197,6 @@ public class Roll {
 				rolls.add((rand.nextInt(8) + 1));
 
 				if (favored && rolls.get(i).equals(1)) {
-					System.out.println("D8 Rerolled");
 					rolls.set(i, (rand.nextInt(8) + 1));
 					favored = false;
 				}
@@ -187,7 +205,7 @@ public class Roll {
 				rolls.add((rand.nextInt(6) + 1));
 
 				if (favored && rolls.get(i).equals(1)) {
-					System.out.println("D6 Rerolled");
+
 					rolls.set(i, (rand.nextInt(6) + 1));
 					favored = false;
 				}
@@ -195,7 +213,6 @@ public class Roll {
 			if (dice.get(i).equals(4)) {
 				rolls.add((rand.nextInt(4) + 1));
 				if (favored && rolls.get(i).equals(1)) {
-					System.out.println("D4 Rerolled");
 					rolls.set(i, (rand.nextInt(4) + 1));
 					favored = false;
 				}
@@ -253,8 +270,15 @@ public class Roll {
 
 	private String getRollType(String messageContent) {
 		String _retVal = null;
+		
+		String command;
+		if(messageContent.indexOf(" ")  != -1) {
+			command = messageContent.substring(0, messageContent.indexOf(" "));
+		} else {
+			command = messageContent;
+		}
 
-		switch (messageContent.substring(0, messageContent.indexOf(" "))) {
+		switch (command) {
 			case "!roll":
 			case "!r":
 				_retVal = "roll";
@@ -267,6 +291,9 @@ public class Roll {
 				break;
 			case "!parry":
 				_retVal = "parry";
+				break;
+			case "!flip":
+				_retVal = "flip";
 				break;
 		}
 

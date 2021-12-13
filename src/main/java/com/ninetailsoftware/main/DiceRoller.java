@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
+import com.ninetailsoftware.commands.CommandRouter;
 import com.ninetailsoftware.commands.Help;
 import com.ninetailsoftware.commands.Initiative;
 import com.ninetailsoftware.commands.Roll;
@@ -15,10 +16,7 @@ import com.ninetailsoftware.commands.Status;
 
 public class DiceRoller {
 
-	private static Roll roller = new Roll();
-	private static Initiative init = new Initiative();
-	private static Status status = new Status();
-	private static Help help = new Help();
+	private static CommandRouter router= new CommandRouter();
 
 	public void CreateInvite() {
 		Properties properties = new Properties();
@@ -52,38 +50,16 @@ public class DiceRoller {
 		String token = properties.getProperty("serverToken");
 
 		DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
-
+		
 		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!roll") || event.getMessageContent().startsWith("!r ")
-					|| event.getMessageContent().startsWith("!counter")
-					|| event.getMessageContent().startsWith("!parry") || event.getMessageContent().startsWith("!dodge")
-					|| event.getMessageContent().startsWith("!flip")) {
-				roller.rollDice(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
+			if (event.getMessageContent().startsWith("!")) {
+				router.routeCommand(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
 						event.getChannel());
 			}
 		});
 
 		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!init")) {
-				init.initativeRoll(event.getMessageContent(), event.getMessageAuthor().getDisplayName(),
-						event.getChannel());
-			}
-		});
-
-		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!status")) {
-				status.statusCommand(event.getMessageContent(), event.getChannel());
-			}
-		});
-
-		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!help")) {
-				help.showHelp(event.getChannel());
-			}
-		});
-
-		api.addMessageCreateListener(event -> {
-			if (event.getMessageContent().startsWith("!quit diceroller")
+			if (event.getMessageContent().startsWith("!quit")
 					&& event.getMessageAuthor().getDiscriminatedName().equalsIgnoreCase("tierran#9477")) {
 				System.exit(0);
 			}

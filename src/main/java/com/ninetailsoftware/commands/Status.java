@@ -38,6 +38,9 @@ public class Status {
 		case "drop":
 			dropCharacter(messageContent);
 			break;
+		default:
+			showAllStatus(channel);
+			break;
 		}
 	}
 
